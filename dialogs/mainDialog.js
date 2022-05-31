@@ -56,7 +56,7 @@ class MainDialog extends LogoutDialog {
       new WaterfallDialog(MAIN_WATERFALL_DIALOG, [
         this.promptStep.bind(this),
         this.loginStep.bind(this),
-        this.qnaMakerDialog(this),
+        this.qnaMaker.bind(this),
       ])
     );
     this.addDialog(
@@ -87,9 +87,9 @@ class MainDialog extends LogoutDialog {
     }
   }
 
-  // async qnaMaker(stepContext) {
-  //   return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
-  // }
+  async qnaMaker(stepContext) {
+    return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
+  }
   async promptStep(stepContext) {
     return await stepContext.beginDialog(OAUTH_PROMPT);
   }
