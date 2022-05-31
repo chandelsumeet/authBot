@@ -88,7 +88,7 @@ class MainDialog extends LogoutDialog {
   }
 
   async qnaMaker(stepContext) {
-    return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
+    await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
   }
   async promptStep(stepContext) {
     return await stepContext.beginDialog(OAUTH_PROMPT);
