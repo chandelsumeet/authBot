@@ -2,109 +2,119 @@
 // Licensed under the MIT License.
 
 const {
-    ConfirmPrompt,
-    DialogSet,
-    DialogTurnStatus,
-    OAuthPrompt,
-    WaterfallDialog,
+  ConfirmPrompt,
+  DialogSet,
+  DialogTurnStatus,
+  OAuthPrompt,
+  WaterfallDialog,
 } = require("botbuilder-dialogs");
 
 const { LogoutDialog } = require("./logoutDialog");
-
+const { QnAMakerDialog } = require("botbuilder-ai");
 const CONFIRM_PROMPT = "ConfirmPrompt";
 const MAIN_DIALOG = "MainDialog";
 const MAIN_WATERFALL_DIALOG = "MainWaterfallDialog";
 const OAUTH_PROMPT = "OAuthPrompt";
+const QNAMAKER_BASE_DIALOG = "qnamaker-base-dialog";
+
+const createQnAMakerDialog = (
+  knowledgeBaseId,
+  endpointKey,
+  endpointHostName,
+  defaultAnswer
+) => {
+  let noAnswerActivity;
+  if (typeof defaultAnswer === "string") {
+    noAnswerActivity = MessageFactory.text(defaultAnswer);
+  }
+
+  const qnaMakerDialog = new QnAMakerDialog(
+    knowledgeBaseId,
+    endpointKey,
+    endpointHostName,
+    noAnswerActivity
+  );
+  qnaMakerDialog.id = QNAMAKER_BASE_DIALOG;
+
+  return qnaMakerDialog;
+};
 
 class MainDialog extends LogoutDialog {
-    constructor() {
-        super(MAIN_DIALOG, process.env.connectionName);
+  constructor(knowledgeBaseId, endpointKey, endpointHostName, defaultAnswer) {
+    super(MAIN_DIALOG, process.env.connectionName);
 
-        this.addDialog(
-            new OAuthPrompt(OAUTH_PROMPT, {
-                connectionName: process.env.connectionName,
-                text: "Please Sign In",
-                title: "Sign In",
-                timeout: 300000,
-            })
-        );
-        this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT));
-        this.addDialog(
-            new WaterfallDialog(MAIN_WATERFALL_DIALOG, [
-                this.promptStep.bind(this),
-                this.loginStep.bind(this),
-                this.displayTokenPhase1.bind(this),
-                this.displayTokenPhase2.bind(this),
-            ])
-        );
+    this.addDialog(
+      new OAuthPrompt(OAUTH_PROMPT, {
+        connectionName: process.env.connectionName,
+        text: "Please Sign In",
+        title: "Sign In",
+        timeout: 300000,
+      })
+    );
+    this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT));
+    this.addDialog(
+      new WaterfallDialog(MAIN_WATERFALL_DIALOG, [
+        this.promptStep.bind(this),
+        this.loginStep.bind(this),
+        this.qnaMaker.bind(this),
+      ])
+    );
+    this.addDialog(
+      createQnAMakerDialog(
+        knowledgeBaseId,
+        endpointKey,
+        endpointHostName,
+        defaultAnswer
+      )
+    );
+    this.initialDialogId = MAIN_WATERFALL_DIALOG;
+  }
 
-        this.initialDialogId = MAIN_WATERFALL_DIALOG;
+  /**
+   * The run method handles the incoming activity (in the form of a DialogContext) and passes it through the dialog system.
+   * If no dialog is active, it will start the default dialog.
+   * @param {*} dialogContext
+   */
+
+  async run(context, accessor) {
+    const dialogSet = new DialogSet(accessor);
+    dialogSet.add(this);
+
+    const dialogContext = await dialogSet.createContext(context);
+    const results = await dialogContext.continueDialog();
+    if (results.status === DialogTurnStatus.empty) {
+      await dialogContext.beginDialog(this.id);
     }
+  }
 
-    /**
-     * The run method handles the incoming activity (in the form of a DialogContext) and passes it through the dialog system.
-     * If no dialog is active, it will start the default dialog.
-     * @param {*} dialogContext
-     */
-    async run(context, accessor) {
-        const dialogSet = new DialogSet(accessor);
-        dialogSet.add(this);
+  async qnaMaker(stepContext) {
+    return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
+  }
+  async promptStep(stepContext) {
+    return await step.beginDialog(QNAMAKER_BASE_DIALOG);
+    // console.log("1step:", stepContext.result);
+    // return await stepContext.beginDialog(OAUTH_PROMPT);
+  }
 
-        const dialogContext = await dialogSet.createContext(context);
-        const results = await dialogContext.continueDialog();
-        if (results.status === DialogTurnStatus.empty) {
-            await dialogContext.beginDialog(this.id);
-        }
+  async loginStep(stepContext) {
+    // Get the token from the previous step. Note that we could also have gotten the
+    // token directly from the prompt itself. There is an example of this in the next method.
+    const tokenResponse = stepContext.result;
+    if (tokenResponse) {
+      await stepContext.context.sendActivity("You are now logged in.");
+      //   return await stepContext.prompt(
+      //     CONFIRM_PROMPT,
+      //     "Would you like to view your token?"
+      //   );
+
+      // return await stepContext.endDialog();
+
+      //  return await step.beginDialog(QNAMAKER_BASE_DIALOG);
     }
-
-    async promptStep(stepContext) {
-        return await stepContext.beginDialog(OAUTH_PROMPT);
-    }
-
-    async loginStep(stepContext) {
-        // Get the token from the previous step. Note that we could also have gotten the
-        // token directly from the prompt itself. There is an example of this in the next method.
-        const tokenResponse = stepContext.result;
-        if (tokenResponse) {
-            await stepContext.context.sendActivity("You are now logged in.");
-            return await stepContext.prompt(
-                CONFIRM_PROMPT,
-                "Would you like to view your token?"
-            );
-        }
-        await stepContext.context.sendActivity(
-            "Login was not successful please try again."
-        );
-        return await stepContext.endDialog();
-    }
-
-    async displayTokenPhase1(stepContext) {
-        await stepContext.context.sendActivity("Thank you.");
-
-        const result = stepContext.result;
-        if (result) {
-            // Call the prompt again because we need the token. The reasons for this are:
-            // 1. If the user is already logged in we do not need to store the token locally in the bot and worry
-            // about refreshing it. We can always just call the prompt again to get the token.
-            // 2. We never know how long it will take a user to respond. By the time the
-            // user responds the token may have expired. The user would then be prompted to login again.
-            //
-            // There is no reason to store the token locally in the bot because we can always just call
-            // the OAuth prompt to get the token or get a new token if needed.
-            return await stepContext.beginDialog(OAUTH_PROMPT);
-        }
-        return await stepContext.endDialog();
-    }
-
-    async displayTokenPhase2(stepContext) {
-        const tokenResponse = stepContext.result;
-        if (tokenResponse) {
-            await stepContext.context.sendActivity(
-                `Here is your token ${tokenResponse.token}`
-            );
-        }
-        return await stepContext.endDialog();
-    }
+    await stepContext.context.sendActivity(
+      "Login was not successful please try again."
+    );
+  }
 }
 
 module.exports.MainDialog = MainDialog;
