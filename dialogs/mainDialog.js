@@ -100,18 +100,12 @@ class MainDialog extends LogoutDialog {
     const tokenResponse = stepContext.result;
     if (tokenResponse) {
       await stepContext.context.sendActivity("You are now logged in.");
-      //   return await stepContext.prompt(
-      //     CONFIRM_PROMPT,
-      //     "Would you like to view your token?"
-      //   );
-
-      // return await stepContext.endDialog();
-
-      //  return await step.beginDialog(QNAMAKER_BASE_DIALOG);
+      return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
     }
     await stepContext.context.sendActivity(
       "Login was not successful please try again."
     );
+    return await stepContext.endDialog();
   }
 }
 
