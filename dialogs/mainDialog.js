@@ -91,9 +91,7 @@ class MainDialog extends LogoutDialog {
     return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
   }
   async promptStep(stepContext) {
-    return await step.beginDialog(QNAMAKER_BASE_DIALOG);
-    // console.log("1step:", stepContext.result);
-    // return await stepContext.beginDialog(OAUTH_PROMPT);
+    return await stepContext.beginDialog(OAUTH_PROMPT);
   }
 
   async loginStep(stepContext) {
