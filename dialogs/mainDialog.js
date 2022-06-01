@@ -64,7 +64,7 @@ class MainDialog extends LogoutDialog {
       new WaterfallDialog(MAIN_WATERFALL_DIALOG, [
         this.promptStep.bind(this),
         this.loginStep.bind(this),
-        this.qnaMaker.bind(this),
+        // this.qnaMaker.bind(this),
       ])
     );
 
@@ -100,7 +100,8 @@ class MainDialog extends LogoutDialog {
     const tokenResponse = stepContext.result;
     if (tokenResponse) {
       await stepContext.context.sendActivity("You are now logged => 4");
-      return await stepContext.next();
+      return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
+      // return await stepContext.next();
     }
     await stepContext.context.sendActivity(
       "Login was not successful please try again."
