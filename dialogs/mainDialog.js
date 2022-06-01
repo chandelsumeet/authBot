@@ -86,15 +86,7 @@ class MainDialog extends LogoutDialog {
 
   async qnaMaker(stepContext) {
     stepContext.context.sendActivity("inside qnaMaker");
-    this.addDialog(
-      new WaterfallDialog(INITIAL_DIALOG, [this.startInitialDialog.bind(this)])
-    );
-    stepContext.context.sendActivity("at line 92");
-    stepContext.parent.endDialog();
-  }
-  async startInitialDialog(stepContext) {
-    stepContext.context.sendActivity("inside Initial line 95");
-    return await step.beginDialog(QNAMAKER_BASE_DIALOG);
+    return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
   }
   async promptStep(stepContext) {
     return await stepContext.beginDialog(OAUTH_PROMPT);
@@ -105,7 +97,7 @@ class MainDialog extends LogoutDialog {
     // token directly from the prompt itself. There is an example of this in the next method.
     const tokenResponse = stepContext.result;
     if (tokenResponse) {
-      await stepContext.context.sendActivity("You are now logged in hi");
+      await stepContext.context.sendActivity("You are now logged in hi-1");
       return await stepContext.next();
     }
     await stepContext.context.sendActivity(
