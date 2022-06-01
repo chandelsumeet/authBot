@@ -17,32 +17,14 @@ const MAIN_WATERFALL_DIALOG = "MainWaterfallDialog";
 const OAUTH_PROMPT = "OAuthPrompt";
 const QNAMAKER_BASE_DIALOG = "qnamaker-base-dialog";
 
-const createQnAMakerDialog = (
-  knowledgeBaseId,
-  endpointKey,
-  endpointHostName,
-  defaultAnswer
-) => {
-  let noAnswerActivity;
-  if (typeof defaultAnswer === "string") {
-    noAnswerActivity = MessageFactory.text(defaultAnswer);
-  }
-
-  const qnaMakerDialog = new QnAMakerDialog(
-    knowledgeBaseId,
-    endpointKey,
-    endpointHostName,
-    noAnswerActivity
-  );
-  qnaMakerDialog.id = QNAMAKER_BASE_DIALOG;
-
-  return qnaMakerDialog;
-};
-
 class MainDialog extends LogoutDialog {
-  constructor(knowledgeBaseId, endpointKey, endpointHostName, defaultAnswer) {
+  constructor(rootDialog) {
     super(MAIN_DIALOG, process.env.connectionName);
 
+    if (!rootDialog)
+      throw new Error(
+        "[MainDialog]: Missing parameter 'rootDialog' is required"
+      );
     this.addDialog(
       new OAuthPrompt(OAUTH_PROMPT, {
         connectionName: process.env.connectionName,
@@ -52,19 +34,11 @@ class MainDialog extends LogoutDialog {
       })
     );
     this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT));
-    this.addDialog(
-      createQnAMakerDialog(
-        knowledgeBaseId,
-        endpointKey,
-        endpointHostName,
-        defaultAnswer
-      )
-    );
+    this.addDialog(rootDialog);
     this.addDialog(
       new WaterfallDialog(MAIN_WATERFALL_DIALOG, [
         this.promptStep.bind(this),
         this.loginStep.bind(this),
-        this.qnaMaker.bind(this),
       ])
     );
 
@@ -87,9 +61,9 @@ class MainDialog extends LogoutDialog {
       await dialogContext.beginDialog(this.id);
     }
   }
-  async qnaMaker(stepContext) {
-    await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
-  }
+  // async qnaMaker(stepContext) {
+  //   return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
+  // }
   async promptStep(stepContext) {
     return await stepContext.beginDialog(OAUTH_PROMPT);
   }
@@ -99,8 +73,8 @@ class MainDialog extends LogoutDialog {
     // token directly from the prompt itself. There is an example of this in the next method.
     const tokenResponse = stepContext.result;
     if (tokenResponse) {
-      await stepContext.context.sendActivity("You are now logged => 6");
-      return await stepContext.next();
+      await stepContext.context.sendActivity("You are now logged => 4");
+      return await stepContext.beginDialog("rootDialog");
     }
     await stepContext.context.sendActivity(
       "Login was not successful please try again."

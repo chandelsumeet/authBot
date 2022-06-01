@@ -25,7 +25,9 @@ const {
 
 const { AuthBot } = require("./bots/authBot");
 const { MainDialog } = require("./dialogs/mainDialog");
+const { RootDialog } = require("./dialogs/rootDialog");
 
+const ROOT_DIALOG = "rootDialog";
 const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
   MicrosoftAppId: process.env.MicrosoftAppId,
   MicrosoftAppPassword: process.env.MicrosoftAppPassword,
@@ -75,12 +77,14 @@ const userState = new UserState(memoryStorage);
 
 // Create the main dialog.
 
-const dialog = new MainDialog(
+// Create the bot that will handle incoming messages.
+const rootDialog = new RootDialog(
   process.env.QnAKnowledgebaseId,
   process.env.QnAAuthKey,
   process.env.QnAEndpointHostName
 );
-// Create the bot that will handle incoming messages.
+
+const dialog = new MainDialog(rootDialog);
 const bot = new AuthBot(conversationState, userState, dialog);
 
 // Create HTTP server.
