@@ -99,7 +99,7 @@ class MainDialog extends LogoutDialog {
     // token directly from the prompt itself. There is an example of this in the next method.
     const tokenResponse = stepContext.result;
     if (tokenResponse) {
-      await stepContext.context.sendActivity("You are now logged => 4");
+      await stepContext.context.sendActivity("You are now logged => 5");
       return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
       // return await stepContext.next();
     }
