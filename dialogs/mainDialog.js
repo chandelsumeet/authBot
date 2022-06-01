@@ -100,7 +100,7 @@ class MainDialog extends LogoutDialog {
     if (tokenResponse && qnaToken === false) {
       await stepContext.context.sendActivity("You are now logged in . Thanks");
       return await stepContext.next();
-    } else {
+    } else if (tokenResponse && qnaToken === true) {
       return await stepContext.next();
     }
     await stepContext.context.sendActivity(
