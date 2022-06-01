@@ -99,8 +99,8 @@ class MainDialog extends LogoutDialog {
     // token directly from the prompt itself. There is an example of this in the next method.
     const tokenResponse = stepContext.result;
     if (tokenResponse) {
-      await stepContext.context.sendActivity("You are now logged");
-      await step.beginDialog(OAUTH_PROMPT);
+      await stepContext.context.sendActivity("You are now logged => 4");
+      await stepContext.next();
     }
     await stepContext.context.sendActivity(
       "Login was not successful please try again."
