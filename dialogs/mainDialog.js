@@ -64,7 +64,7 @@ class MainDialog extends LogoutDialog {
       new WaterfallDialog(MAIN_WATERFALL_DIALOG, [
         this.promptStep.bind(this),
         this.loginStep.bind(this),
-        // this.qnaMaker.bind(this),
+        this.qnaMaker.bind(this),
       ])
     );
 
@@ -88,7 +88,7 @@ class MainDialog extends LogoutDialog {
     }
   }
   async qnaMaker(stepContext) {
-    return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
+    await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
   }
   async promptStep(stepContext) {
     return await stepContext.beginDialog(OAUTH_PROMPT);
@@ -99,9 +99,8 @@ class MainDialog extends LogoutDialog {
     // token directly from the prompt itself. There is an example of this in the next method.
     const tokenResponse = stepContext.result;
     if (tokenResponse) {
-      await stepContext.context.sendActivity("You are now logged => 5");
-      return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
-      // return await stepContext.next();
+      await stepContext.context.sendActivity("You are now logged => 6");
+      return await stepContext.next();
     }
     await stepContext.context.sendActivity(
       "Login was not successful please try again."
