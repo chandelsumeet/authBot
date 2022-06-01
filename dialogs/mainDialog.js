@@ -91,7 +91,6 @@ class MainDialog extends LogoutDialog {
     return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
   }
   async promptStep(stepContext) {
-    await stepContext.endDialog();
     return await stepContext.beginDialog(OAUTH_PROMPT);
   }
 
@@ -101,6 +100,7 @@ class MainDialog extends LogoutDialog {
     const tokenResponse = stepContext.result;
     if (tokenResponse) {
       await stepContext.context.sendActivity("You are now logged");
+      await step.beginDialog(OAUTH_PROMPT);
     }
     await stepContext.context.sendActivity(
       "Login was not successful please try again."
