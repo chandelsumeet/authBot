@@ -35,7 +35,7 @@ const createQnAMakerDialog = (
 
   return qnaMakerDialog;
 };
-
+let qnaToken = false;
 class MainDialog extends LogoutDialog {
   constructor(knowledgeBaseId, endpointKey, endpointHostName, defaultAnswer) {
     super(MAIN_DIALOG, process.env.connectionName);
@@ -85,6 +85,7 @@ class MainDialog extends LogoutDialog {
   }
 
   async qnaMaker(stepContext) {
+    qnaToken = true;
     stepContext.context.sendActivity("inside qnaMaker");
     return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
   }
@@ -96,8 +97,10 @@ class MainDialog extends LogoutDialog {
     // Get the token from the previous step. Note that we could also have gotten the
     // token directly from the prompt itself. There is an example of this in the next method.
     const tokenResponse = stepContext.result;
-    if (tokenResponse) {
+    if (tokenResponse && qnaToken === false) {
       await stepContext.context.sendActivity("You are now logged in . Thanks");
+      return await stepContext.next();
+    } else {
       return await stepContext.next();
     }
     await stepContext.context.sendActivity(
