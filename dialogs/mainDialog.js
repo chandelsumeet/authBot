@@ -85,12 +85,15 @@ class MainDialog extends LogoutDialog {
   }
 
   async qnaMaker(stepContext) {
-    stepContext.parent.endDialog();
+    stepContext.context.sendActivity("inside qnaMaker");
     this.addDialog(
       new WaterfallDialog(INITIAL_DIALOG, [this.startInitialDialog.bind(this)])
     );
+    stepContext.context.sendActivity("at line 92");
+    stepContext.parent.endDialog();
   }
-  async startInitialDialog() {
+  async startInitialDialog(stepContext) {
+    stepContext.context.sendActivity("inside Initial line 95");
     return await step.beginDialog(QNAMAKER_BASE_DIALOG);
   }
   async promptStep(stepContext) {
