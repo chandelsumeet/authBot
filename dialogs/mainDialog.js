@@ -36,6 +36,7 @@ const createQnAMakerDialog = (
   return qnaMakerDialog;
 };
 let qnaToken = false;
+let oldToken = "";
 class MainDialog extends LogoutDialog {
   constructor(knowledgeBaseId, endpointKey, endpointHostName, defaultAnswer) {
     super(MAIN_DIALOG, process.env.connectionName);
@@ -89,6 +90,7 @@ class MainDialog extends LogoutDialog {
     return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
   }
   async promptStep(stepContext) {
+    qnaToken = false;
     return await stepContext.beginDialog(OAUTH_PROMPT);
   }
 
