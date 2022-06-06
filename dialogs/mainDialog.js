@@ -5,7 +5,7 @@ const {
   OAuthPrompt,
   WaterfallDialog,
 } = require("botbuilder-dialogs");
-
+const { MessageFactory } = require("botbuilder");
 const { LogoutDialog } = require("./logoutDialog");
 const { QnAMakerDialog } = require("botbuilder-ai");
 const CONFIRM_PROMPT = "ConfirmPrompt";
