@@ -78,7 +78,8 @@ const userState = new UserState(memoryStorage);
 const dialog = new MainDialog(
   process.env.QnAKnowledgebaseId,
   process.env.QnAAuthKey,
-  process.env.QnAEndpointHostName
+  process.env.QnAEndpointHostName,
+  process.env.defaultAnswer
 );
 // Create the bot that will handle incoming messages.
 const bot = new AuthBot(conversationState, userState, dialog);
