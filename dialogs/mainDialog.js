@@ -87,7 +87,7 @@ class MainDialog extends LogoutDialog {
 
   async qnaMaker(stepContext) {
     qnaToken = true;
-    const result = await stepContext.result;
+    const result = await stepContext.context.text;
 
     await stepContext.context.sendActivity(`${result}`);
     // return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
