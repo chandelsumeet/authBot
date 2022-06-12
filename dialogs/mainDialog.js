@@ -90,13 +90,19 @@ class MainDialog extends LogoutDialog {
     const result = await stepContext.context._activity.text;
     const tokenResponse = stepContext.result;
     try {
-      let response = await axios("https://graph.microsoft.com/v1.0/users/me", {
-        headers: { Authorization: `Bearer ${tokenResponse}` },
-      });
+      let response = await axios.get(
+        "https://graph.microsoft.com/v1.0/users/me",
+        {
+          headers: {
+            Authorization: `Bearer ${tokenResponse}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       await stepContext.context.sendActivity("called api");
       await stepContext.context.sendActivity(MessageFactory.text(response));
     } catch {
-      await stepContext.context.sendActivity("failed again..");
+      await stepContext.context.sendActivity("failed thrice");
     }
 
     // return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
