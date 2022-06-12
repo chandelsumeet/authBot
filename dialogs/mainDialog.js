@@ -100,10 +100,13 @@ class MainDialog extends LogoutDialog {
         })
         .then((res) => (response = res))
         .catch((error) => (response = error));
-      await stepContext.context.sendActivity(`called api ${response}`);
+      await stepContext.context.sendActivity(`called api`);
+      await stepContext.context.sendActivity(
+        MessageFactory.text(response, response)
+      );
       //await stepContext.context.sendActivity(MessageFactory.text(response));
     } catch (error) {
-      await stepContext.context.sendActivity("sir...");
+      await stepContext.context.sendActivity(`error->${error}`);
     }
 
     // return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
