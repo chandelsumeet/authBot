@@ -96,7 +96,7 @@ class MainDialog extends LogoutDialog {
       await stepContext.context.sendActivity("called api");
       await stepContext.context.sendActivity(MessageFactory.text(response));
     } catch {
-      await stepContext.context.sendActivity("failed");
+      await stepContext.context.sendActivity("failed again..");
     }
 
     // return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
