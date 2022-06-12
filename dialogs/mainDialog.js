@@ -13,7 +13,7 @@ const MAIN_DIALOG = "MainDialog";
 const MAIN_WATERFALL_DIALOG = "MainWaterfallDialog";
 const OAUTH_PROMPT = "OAuthPrompt";
 const QNAMAKER_BASE_DIALOG = "qnamaker-base-dialog";
-
+const axios = require("axios");
 const createQnAMakerDialog = (
   knowledgeBaseId,
   endpointKey,
@@ -89,7 +89,10 @@ class MainDialog extends LogoutDialog {
     qnaToken = true;
     const result = await stepContext.context._activity.text;
 
-    await stepContext.context.sendActivity(`done ${result}`);
+    const response = await axios("https://graph.microsoft.com/v1.0/users/me");
+
+    await stepContext.context.sendActivity(`res =>${response}`);
+
     // return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
   }
   async promptStep(stepContext) {
