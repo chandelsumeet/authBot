@@ -95,12 +95,13 @@ class MainDialog extends LogoutDialog {
         .get("https://graph.microsoft.com/v1.0/users/me", {
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + tokenResponse,
+            Authorization: "Bearer " + tokenResponse.token,
           },
         })
         .then((res) => (response = res))
         .catch((error) => (response = error));
       await stepContext.context.sendActivity(`called api`);
+      await stepContext.context.sendActivity(`${tokenResponse.token}`);
       await stepContext.context.sendActivity(
         MessageFactory.text(response, response)
       );
