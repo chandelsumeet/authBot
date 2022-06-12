@@ -89,10 +89,14 @@ class MainDialog extends LogoutDialog {
     qnaToken = true;
     const result = await stepContext.context._activity.text;
 
-    let response = await axios("https://graph.microsoft.com/v1.0/users/me");
-    response = JSON.stringify(response);
-    await stepContext.context.sendActivity("called api");
-    await stepContext.context.sendActivity(MessageFactory(response));
+    try {
+      let response = await axios("https://graph.microsoft.com/v1.0/users/me");
+      await stepContext.context.sendActivity("called api");
+      await stepContext.context.sendActivity(MessageFactory.text(response));
+    } catch {
+      await stepContext.context.sendActivity("failed");
+    }
+
     // return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
   }
   async promptStep(stepContext) {
