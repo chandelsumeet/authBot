@@ -92,7 +92,7 @@ class MainDialog extends LogoutDialog {
     const tokenResponse = await stepContext.result;
     try {
       await axios
-        .get("https://graph.microsoft.com/v1.0/users/me", request_data, {
+        .get("https://graph.microsoft.com/v1.0/users/me", {
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + tokenResponse,
