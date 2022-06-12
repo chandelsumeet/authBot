@@ -89,7 +89,7 @@ class MainDialog extends LogoutDialog {
     qnaToken = true;
     const result = await stepContext.context._activity.text;
     let response;
-    const tokenResponse = await stepContext.result;
+    const tokenResponse = stepContext.result;
     try {
       await axios
         .get("https://graph.microsoft.com/v1.0/users/me", {
@@ -123,9 +123,9 @@ class MainDialog extends LogoutDialog {
     const tokenResponse = stepContext.result;
     if (tokenResponse && qnaToken === false) {
       await stepContext.context.sendActivity("You are now logged in . Thanks");
-      return await stepContext.next();
+      return await await stepContext.beginDialog(OAUTH_PROMPT);
     } else if (tokenResponse && qnaToken === true) {
-      return await stepContext.next();
+      return await stepContext.beginDialog(OAUTH_PROMPT);
     }
     await stepContext.context.sendActivity(
       "Login was not successful please try again."
